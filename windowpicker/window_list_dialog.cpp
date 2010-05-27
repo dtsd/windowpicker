@@ -177,6 +177,12 @@ void WindowListDialog::setupUi() {
 		this, 
 		SLOT(selectWindow(const QModelIndex &))
 	);
+	connect(
+		p->view,
+		SIGNAL(midMouseClicked(const QModelIndex &)),
+		this,
+		SLOT(closeWindow(const QModelIndex &))
+	);
 
 
 	QFrame *hover = new QFrame;

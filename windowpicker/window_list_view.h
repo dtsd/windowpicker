@@ -39,6 +39,7 @@ public:
 	virtual void keyPressEvent(QKeyEvent *e); 
 signals:
 	void hoveredIndexChanged(const QModelIndex &);
+	void midMouseClicked(const QModelIndex &);
 private:
 	bool m_singleClickToActivate;
 	QCursor m_defaultCursor;

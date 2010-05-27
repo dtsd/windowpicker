@@ -59,14 +59,21 @@ void WindowListView::mouseMoveEvent(QMouseEvent *me) {
 void WindowListView::mouseReleaseEvent(QMouseEvent *event) {
 	QListView::mouseReleaseEvent(event);
 
-	if(m_singleClickToActivate 
-		&& !sigleClickSetByStyle() 
+	if(event->button() == Qt::MidButton) {
+		QPoint pos = event->pos();
+		QModelIndex index = indexAt(pos);
+		emit midMouseClicked(index);
+		return;
+	}
+
+	if(m_singleClickToActivate && !sigleClickSetByStyle() 
 		&& event->button() != Qt::RightButton
 		&& !(QApplication::keyboardModifiers() & Qt::ControlModifier))
 	{
 		QPoint pos = event->pos();
-		QPersistentModelIndex index = indexAt(pos);
+		QModelIndex index = indexAt(pos);
 		emit activated(index);
+		return;
 	}
 };
 
