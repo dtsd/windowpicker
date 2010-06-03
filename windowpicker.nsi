@@ -2,7 +2,7 @@
 Name "windowpicker"
 
 ; The file to write
-OutFile "windowpicker.exe"
+OutFile "windowpicker-${WP}.exe"
 
 ; The default installation directory
 InstallDir $PROGRAMFILES\windowpicker
@@ -16,8 +16,8 @@ RequestExecutionLevel admin
 
 ;--------------------------------
 
-;!define MINGW "C:\Qt4\qt4-mingw-2010.02\mingw"
-!define MINGW "C:\Qt\2010.02\mingw"
+!define MINGW "C:\Qt4\qt4-mingw-2010.02\mingw"
+;!define MINGW "C:\Qt\2010.02\mingw"
 !define STARTUP_RUN_KEY				"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
 !define WNDTITLE "windowpicker"
 !define WNDCLASS "QPopup"

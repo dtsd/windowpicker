@@ -20,6 +20,7 @@
 
 #include <QString>
 #include <QList>
+#include <QSet>
 #include <QPixmapCache>
 #include <QTime>
 #include <QMap>
@@ -167,11 +168,37 @@ void WindowController::updateWindowInfoList() {
 	}
 
 	updateCaptionCache();
+
+	cleanUpPreviewCache();
+	cleanUpCaptionCache();
+}
+
+void WindowController::cleanUpPreviewCache() {
+	WindowHandleSet set = windowHandleList().toSet();
+	PixmapCache::iterator it = p->previewCache.begin(); 
+	while(it != p->previewCache.end()){
+		if(!set.contains(it.key())) {
+			it = p->previewCache.erase(it);
+		} else {
+			++it;
+		}
+	}
+}
+
+void WindowController::cleanUpCaptionCache() {
+	WindowHandleSet set = windowHandleList().toSet();
+	StringCache::iterator it = p->captionCache.begin(); 
+	while(it != p->captionCache.end()){
+		if(!set.contains(it.key())) {
+			it = p->captionCache.erase(it);
+		} else {
+			++it;
+		}
+	}
 }
 
 void WindowController::updateCaptionCache() {
 	StringCache tmp = p->captionCache;
-	p->captionCache.clear();
 	for(WindowHandleList::const_iterator it = p->windowHandleList.begin();
 		it != p->windowHandleList.end(); ++it) {
 		p->captionCache[*it] = impl->windowCaption(*it);

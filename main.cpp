@@ -41,7 +41,10 @@ int main(int argc, char * argv[])
 	QCoreApplication::setOrganizationName("Dmitry Teslenko");
 	QCoreApplication::setOrganizationDomain("dteslenko@gmail.com");
 	QCoreApplication::setApplicationName("windowpicker");
-	QCoreApplication::setApplicationVersion("1.0");
+	QCoreApplication::setApplicationVersion(QString("%1.%2")
+		.arg(VERSION_MAJOR)
+		.arg(VERSION_MINOR)
+	);
 
     QApplication::setQuitOnLastWindowClosed(false);
 

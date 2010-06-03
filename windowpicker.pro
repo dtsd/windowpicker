@@ -4,6 +4,12 @@ TARGET = windowpicker
 #DEPENDPATH += .
 INCLUDEPATH += .
 
+VERSION_MAJOR = 1
+VERSION_MINOR = 1
+VERSION = "$${VERSION_MAJOR}.${VERSION_MINOR}"
+
+DEFINES += VERSION_MAJOR VERSION_MINOR
+
 DESTDIR += install
 
 {
@@ -83,3 +89,21 @@ TRANSLATIONS +=  \
 win32 {
 	RC_FILE = windowpicker.rc
 }
+
+#setup
+win32 {
+	#nsis.target = windowpicker.exe
+	nsis.commands = makensis /DWP=$${VERSION} windowpicker.nsi 
+	nsis.depends = windowpicker.nsi
+
+	QMAKE_EXTRA_TARGETS += nsis
+}
+
+
+#tarball.commands = git archive --format zip --output="$${TARGET}-$${VERSION}.zip" master 
+tarball.commands = git archive master | bzip2 > "$${TARGET}-$${VERSION}.tar.bz2" 
+
+QMAKE_EXTRA_TARGETS += tarball
+
+
+

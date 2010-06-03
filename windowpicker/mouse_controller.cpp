@@ -172,7 +172,7 @@ void MouseController::disable() {
 QRect MouseController::getHitCornerRect(ECorner corner) {
 	QSize desktopSize = static_cast<QApplication *>(
 		QApplication::instance()
-	)->desktop()->availableGeometry().size();
+	)->desktop()->screenGeometry().size();
 
 	QSize rectSize = desktopSize * 0.02;
 	QPoint topLeft = QPoint(0, 0);

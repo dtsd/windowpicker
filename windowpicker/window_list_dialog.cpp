@@ -210,7 +210,7 @@ void WindowListDialog::setupUi() {
 	layout->addWidget(p->view);
 	layout->addWidget(hover);
 
-	QSize size = static_cast<QApplication *>(QApplication::instance())->desktop()->availableGeometry().size();
+	QSize size = static_cast<QApplication *>(QApplication::instance())->desktop()->screenGeometry().size();
 	size *= 0.9;
 	resize(size);
 

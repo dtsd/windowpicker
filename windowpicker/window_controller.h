@@ -76,7 +76,6 @@ public slots:
 	void startSelectWindow(int);
 	void startWindowPreview(int handle);
 	void apply(const Config &);
-protected slots:
 signals:
 	void windowPreviewChanged(int handle);
 	void windowPreviewSizeChanged(int handle);
@@ -99,6 +98,9 @@ private:
 		const WindowHandleList &oldList,
 		const WindowHandleList &newList
 	);
+
+	void cleanUpPreviewCache();
+	void cleanUpCaptionCache();
 
 	WindowController();
 	~WindowController();
