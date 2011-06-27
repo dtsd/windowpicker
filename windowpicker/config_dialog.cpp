@@ -170,8 +170,8 @@ void ConfigDialog::setupUi() {
     p->listWidget->setViewMode(QListView::IconMode);
     p->listWidget->setIconSize(QSize(32, 32));
     p->listWidget->setMovement(QListView::Static);
-    p->listWidget->setFixedWidth(100);
-    p->listWidget->setGridSize(QSize(95, 55));
+    p->listWidget->setFixedWidth(120);
+    p->listWidget->setGridSize(QSize(115, 55));
     p->listWidget->setSpacing(12);
 
 

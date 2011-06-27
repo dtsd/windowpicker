@@ -30,6 +30,8 @@
 #include <QMenu>
 #include <QLabel>
 #include <QMouseEvent>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QWheelEvent>
 
 #include "windowpicker/window_controller.h"
@@ -716,6 +718,23 @@ void WindowListDialog::delayedUpdateWindowPreview(int handle) {
 	} else {
 		p->updateWindowPreviewOnShow.insert(handle);
 	}
+}
+
+void WindowListDialog::notifyAboutNewVersion(const QString &version, const QString &url)
+{
+	if(QMessageBox::information(
+		this,
+		QCoreApplication::applicationName(),
+		QString(tr("New version %1 is available for download!"
+		"\nClick OK to download update.")).arg(version),
+		QMessageBox::Ok | QMessageBox::Cancel
+	) != QMessageBox::Ok )
+	{
+		return;
+	}
+
+	//qDebug("QDesktopServices::openUrl(QUrl(url)): %s", qPrintable(url));
+	QDesktopServices::openUrl(QUrl(url));
 }
 
 }

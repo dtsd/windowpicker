@@ -58,6 +58,16 @@ int main(int argc, char * argv[])
 	WindowPicker::WindowListDialog dlg;
 	dlg.apply(config);
 
+	WindowPicker::UpdateFromGoogleCode update;
+
+	QObject::connect(
+		&update,
+		SIGNAL(newVersionAvailable(const QString &, const QString &)),
+		&dlg,
+		SLOT(notifyAboutNewVersion(const QString &, const QString &))
+	);
+	update.apply(config);
+
 	WindowPicker::TrayIcon icon;
 	WindowPicker::ConfigDialog configDialog(&config);
 	QObject::connect(

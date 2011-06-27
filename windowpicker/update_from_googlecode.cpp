@@ -71,7 +71,7 @@ void UpdateFromGoogleCode::check()
 		QNetworkAccessManager manager;
 		QNetworkRequest request(
 			QUrl(
-				QString("http://code.google.com/p/%s/downloads/list")
+				QString("http://code.google.com/p/%1/downloads/list")
 					.arg(QCoreApplication::applicationName())
 			)
 		);
@@ -86,7 +86,7 @@ void UpdateFromGoogleCode::check()
 		QString html = stream.readAll();
 		reply->close();
 
-		QRegExp re("\\['[^']+', 'Download[^']+', '//(?P<url>[^']+)', '(?P<tags>[^']+)'\\]");
+		QRegExp re("\\['[^']+', 'Download[^']+', '//([^']+)', '([^']+)'\\]");
 		int pos = 0;
 		
 		QStringList requiredTags;
@@ -94,11 +94,14 @@ void UpdateFromGoogleCode::check()
 		requiredTags << "Type-Executable" << "OpSys-Windows";
 #endif
 
-		QString maxVersion;
-		while((pos = re.indexIn(html)) != -1)
+		QString maxVersion, maxUrl;
+		while((pos = re.indexIn(html, pos)) != -1)
 		{
 			QString url = re.cap(1),
 				tags = re.cap(2);
+			QString version = extractVersionFromUrl(url);
+
+			//qDebug("Found match: %s: %s", qPrintable(tags), qPrintable(url));
 
 			for(QStringList::const_iterator it = requiredTags.begin(); it != requiredTags.end(); ++it)
 			{
@@ -108,20 +111,21 @@ void UpdateFromGoogleCode::check()
 				}
 			}
 
-			QString version = extractVersionFromUrl(url);
 
 			if(isVersionGreater(maxVersion, version))
 			{
 				maxVersion = version;
+				maxUrl = url;
 			}
 
 			not_found:
-				;
+			pos += re.matchedLength();
+
 		}
 
 		if(isVersionGreater(QCoreApplication::applicationVersion(), maxVersion))
 		{
-			emit newVersionAvailable(maxVersion);
+			emit newVersionAvailable(maxVersion, "http://" + maxUrl);
 		}
 	}
 

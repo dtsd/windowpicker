@@ -29,8 +29,9 @@ class Config;
 
 class UpdateFromGoogleCode  : public QObject
 {
+	Q_OBJECT
 public:
-	UpdateFromGoogleCode(QObject *);
+	UpdateFromGoogleCode(QObject * = 0);
 	virtual ~UpdateFromGoogleCode();
 
 	static bool isVersionGreater(const QString &, const QString &);
@@ -40,7 +41,7 @@ public slots:
 	void check();
 
 signals:
-	void newVersionAvailable(const QString &);
+	void newVersionAvailable(const QString &/*version*/, const QString &/*url*/);
 private:
 	void start();
 	void stop();

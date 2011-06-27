@@ -75,6 +75,7 @@ protected slots:
 	void updateWindowPreviews();
 
 	void delayedUpdateWindowPreview(int);
+	void notifyAboutNewVersion(const QString &version, const QString &url);
 private:
 	void setupUi();
 	void translateUi();
