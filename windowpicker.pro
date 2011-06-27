@@ -39,7 +39,8 @@ HEADERS += \
 	windowpicker/window_list_view.h \
 	windowpicker/tray_icon.h \
 	windowpicker/unique_runnable.h \
-	windowpicker/unique_runnable_inl.h
+	windowpicker/unique_runnable_inl.h \
+	windowpicker/update_from_googlecode.h
 
 SOURCES += \
 	windowpicker/about_dialog.cpp \
@@ -55,7 +56,8 @@ SOURCES += \
 	windowpicker/window_list_model.cpp \
 	windowpicker/window_list_view.cpp \
 	windowpicker/tray_icon.cpp \
-	windowpicker/unique_runnable.cpp
+	windowpicker/unique_runnable.cpp \
+	windowpicker/update_from_googlecode.cpp
 
 win32 {
 SOURCES += \

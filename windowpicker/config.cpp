@@ -30,6 +30,7 @@ Key Config::c_i18nFile = "i18nFile";
 Key Config::c_showHotkeyLabels = "showHotkeyLabels";
 Key Config::c_defaultHitCorner = "defaultHitCorner";
 Key Config::c_ignoredWindows = "ignoredWindows";
+Key Config::c_updateCheckIntervalHours = "updateCheckIntervalHours";
 
 struct ConfigPrivate {
 	ConfigPrivate() :isSetLater(false) {};
@@ -57,6 +58,7 @@ void Config::setupDefaults() {
 	p->defaults[c_defaultHitCorner] = 0;
 
 	p->defaults[c_ignoredWindows] = QList<QVariant>();
+	p->defaults[c_updateCheckIntervalHours] = 24;
 }
 
 QVariant Config::defaultValue(const QString &key) const {
@@ -172,6 +174,17 @@ QList<QVariant> Config::ignoredWindows() const {
 
 void Config::setIgnoredWindows(const QList<QVariant> &value) {
 	p->settings.setValue(c_ignoredWindows, value);
+	emitChanged();
+}
+
+int Config::updateCheckIntervalHours() const {
+	return p->settings.value(
+		c_updateCheckIntervalHours, defaultValue(c_updateCheckIntervalHours)
+	).toInt();
+}
+
+void Config::setUpdateCheckIntervalHours(int value) {
+	p->settings.setValue(c_updateCheckIntervalHours, value);
 	emitChanged();
 }
 

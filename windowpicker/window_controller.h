@@ -99,6 +99,9 @@ signals:
 	void windowIgnoreRequested(const QString &, const QString &);
 private:
 	void setWindowPreview(int handle, const QPixmap &);
+	WindowHandleList filterWindowList(const WindowHandleList &);
+
+
 	WindowControllerImpl *impl;
 	void updateHotkeys();
 	void updateCaptionCache();

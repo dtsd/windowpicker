@@ -29,15 +29,18 @@
 #include "windowpicker/shortcut_controller.h"
 #include "windowpicker/config.h"
 #include "windowpicker/config_dialog.h"
+#include "windowpicker/update_from_googlecode.h"
 
 int main(int argc, char * argv[])
 {
+
 
 	QtSingleApplication app(argc, argv);
 	if(app.isRunning()) {
 		app.sendMessage(QString::null);
 		return 0;
 	}
+
 
 	QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
 	QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);

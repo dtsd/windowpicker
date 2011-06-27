@@ -51,7 +51,9 @@ class IgnoredWindowsModel : public QAbstractTableModel
 public:
 	void setIgnoredWindows(const QList<QVariant> &ignoredWindows) 
 	{
+		beginResetModel();
 		m_ignoredWindows = ignoredWindows;
+		endResetModel();
 	};
 	QList<QVariant> ignoredWindows() const 
 	{
@@ -263,12 +265,10 @@ void ConfigDialog::ignoreWindow(const QString &caption, const QString &className
 	p->ignoredWindowsModel.setIgnoredWindows(ignoredWindows);
 	p->config->setLater(Config::c_ignoredWindows, ignoredWindows);
 
-	/*if(!isVisible())
-	{*/
+	if(!isVisible())
+	{
 		p->config->commit();
-	//}
-	qDebug(qPrintable(caption));
-	qDebug(qPrintable(className));
+	}
 }
 
 void ConfigDialog::removeSelectedIgnoredWindow()

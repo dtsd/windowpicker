@@ -58,6 +58,11 @@ class Config: public QObject {
 	Q_PROPERTY (QList<QVariant> ignoredWindows
 		READ ignoredWindows WRITE setIgnoredWindows
 	)
+
+	Q_PROPERTY (int updateCheckIntervalHours
+		READ updateCheckIntervalHours
+		WRITE setUpdateCheckIntervalHours
+	)
 public:
 	Config();
 	virtual ~Config();
@@ -93,6 +98,10 @@ public:
 	QList<QVariant> ignoredWindows() const;
 	void setIgnoredWindows(const QList<QVariant> &);
 	static Key c_ignoredWindows;
+
+	int updateCheckIntervalHours() const;
+	void setUpdateCheckIntervalHours(int);
+	static Key c_updateCheckIntervalHours;
 signals:
 	void changed(const Config &);
 private:

@@ -53,6 +53,7 @@ QDataStream & operator>>(QDataStream & in, WindowPicker::WindowInfo & info)
 	return in;
 };
 
+Q_DECLARE_METATYPE(WindowPicker::WindowInfo)
 
 namespace WindowPicker {
 
@@ -141,6 +142,7 @@ struct WindowControllerPrivate {
 	WindowHandleList windowHandleList/*, windowHandleListBackup*/;
 	HotkeyMap hotkeyMap;
 	bool isHotkeyLabelsShown;
+	WindowInfoList ignoredWindows;
 };
 
 WindowController::WindowController() : impl(new WindowControllerImpl), p(new WindowControllerPrivate) {
@@ -173,10 +175,34 @@ void WindowController::updateHotkeys() {
 		p->hotkeyMap[* it] = hotkey;
 	}
 }
+WindowHandleList WindowController::filterWindowList(const WindowHandleList &list)
+{
+	WindowHandleList result;
+	for(WindowHandleList::const_iterator it = list.begin(); it != list.end(); ++it)
+	{
+		QString caption = windowCaption(*it),	
+			className = windowClassName(*it);
+		for(WindowInfoList::const_iterator it2 = p->ignoredWindows.begin();
+			it2 != p->ignoredWindows.end(); ++it2)
+		{
+			if((*it2).caption.contains(caption) 
+				&& (*it2).className.contains(className))
+			{
+				goto not_found;
+			}
+		}
+		result << (*it);
+not_found:
+		;
+	}
+	return result;
+}
 
 void WindowController::updateWindowInfoList() {
 	impl->updateWindowInfoList();
 	WindowHandleList tmp1 = p->windowHandleList, tmp2 = impl->windowHandleList();
+
+	tmp2 = filterWindowList(tmp2);
 
 	if(tmp1 != tmp2) {
 		compareAndEmitDisappeared(tmp1, tmp2);
@@ -480,6 +506,14 @@ void WindowController::startUpdateWindowPreviews() {
 
 void WindowController::apply(const Config &config) {
 	p->isHotkeyLabelsShown = config.showHotkeyLabels();
+
+	p->ignoredWindows.clear();
+	QList<QVariant> list = config.ignoredWindows();
+	for(QList<QVariant>::const_iterator it = list.begin(); it != list.end(); ++it)
+	{
+		WindowInfo info = (*it).value<WindowPicker::WindowInfo>();
+		p->ignoredWindows << info;
+	}
 }
 
 void WindowController::compareAndEmitAppeared(
