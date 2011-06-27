@@ -25,12 +25,6 @@
 
 namespace WindowPicker {
 
-struct WindowInfo {
-	int window;
-	QString caption;
-};
-
-typedef QList<WindowInfo> WindowInfoList;
 WindowInfoList WindowControllerImpl_taskInfoList;
 
 int WindowInfoList_findByWindow(const WindowInfoList &list, int window) {

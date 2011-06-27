@@ -55,6 +55,7 @@ protected slots:
 	void selectWindow(const QModelIndex &);
 	void showContextMenu(const QPoint &);
 	void minimizeWindow(const QModelIndex &);
+	void ignoreWindow(const QModelIndex &);
 	void maximizeWindow(const QModelIndex &);
 	void closeWindow(const QModelIndex &);
 
@@ -65,6 +66,7 @@ protected slots:
 	void minimizeSelected();
 	void maximizeSelected();
 	void closeSelected();
+	void ignoreSelected();
 
 	void triggerHotkey();
 	void displayHoveredWindowCaption(const QModelIndex &);

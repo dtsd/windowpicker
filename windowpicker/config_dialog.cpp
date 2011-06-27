@@ -32,12 +32,82 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QEvent>
+#include <QAbstractTableModel>
+#include <QTableView>
+#include <QDataStream>
 
 #include "windowpicker/config.h"
+#include "windowpicker/window_controller.h"
 #include "windowpicker/keysequence_edit.h"
 #include "windowpicker/i18n_controller.h"
 
+
+Q_DECLARE_METATYPE(WindowPicker::WindowInfo)
+
 namespace WindowPicker {
+
+class IgnoredWindowsModel : public QAbstractTableModel
+{
+public:
+	void setIgnoredWindows(const QList<QVariant> &ignoredWindows) 
+	{
+		m_ignoredWindows = ignoredWindows;
+	};
+	QList<QVariant> ignoredWindows() const 
+	{
+		return m_ignoredWindows;
+	};
+
+	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const
+	{
+		return m_ignoredWindows.size();
+	};
+	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const
+	{
+		return 2;
+	};
+	virtual QVariant data(const QModelIndex & index, 
+		int role = Qt::DisplayRole) const
+	{
+		if(!index.isValid())
+		{
+			return QVariant();
+		}
+
+		switch(role)
+		{
+			case Qt::DisplayRole:
+				{
+					QVariant windowVariant = m_ignoredWindows.at(index.row());
+					WindowInfo info = windowVariant.value<WindowPicker::WindowInfo>();
+					return index.column() == 0 ? info.caption : info.className;
+				}
+				break;
+			default:
+				return QVariant();
+		}
+
+	};
+		/*
+	virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+	*/
+	QVariant headerData(int /*section*/, Qt::Orientation orientation, int role) const 
+	{
+		if(orientation == Qt::Horizontal) {
+			if(role == Qt::SizeHintRole) {
+				return QSize(0, 0);
+			}
+		} else if (orientation == Qt::Vertical) {
+			if(role == Qt::SizeHintRole) {
+				return QSize(0, 0);
+			}
+		}
+		return QVariant();
+	}
+
+private:
+	QList<QVariant> m_ignoredWindows;
+};
 
 
 struct ConfigDialogPrivate {
@@ -48,8 +118,10 @@ struct ConfigDialogPrivate {
 		config(0),
 		ok(0), cancel(0),
 		keyboardItem(0), mouseItem(0), i18nItem(0),
+		compatibilityItem(0), updateItem(0),
 		languageLabel(0), defaultHotkeyLabel(0),
-		r1(0), r2(0), defaultHitCornerBox(0), defaultHitCornerLabel(0) {};
+		r1(0), r2(0), defaultHitCornerBox(0), defaultHitCornerLabel(0),
+		removeIgnoredButton(0), ignoredWindowsBox(0), ignoredWindowsView(0) {};
 	QListWidget *listWidget;
 	QStackedWidget *stackedWidget;
 	QButtonGroup *selectWithSingleClickGroup;
@@ -57,14 +129,19 @@ struct ConfigDialogPrivate {
 	QCheckBox *replaceDefaultSwitcherBox, *showHotkeyLabelsBox;
 	QComboBox *languageCombo;
 
+
 	Config *config;
 
 	QPushButton *ok, *cancel;
-	QListWidgetItem *keyboardItem, *mouseItem, *i18nItem;
+	QListWidgetItem *keyboardItem, *mouseItem, *i18nItem, *compatibilityItem, *updateItem;
 	QLabel *languageLabel, *defaultHotkeyLabel;
 	QRadioButton *r1, *r2;
 	QComboBox *defaultHitCornerBox;
 	QLabel *defaultHitCornerLabel;
+	QPushButton *removeIgnoredButton;
+	QGroupBox *ignoredWindowsBox;
+	IgnoredWindowsModel ignoredWindowsModel;
+	QAbstractItemView *ignoredWindowsView;
 };
 
 ConfigDialog::ConfigDialog(Config *config, QWidget *parent) 
@@ -89,9 +166,10 @@ void ConfigDialog::setupUi() {
 
 	p->listWidget = new QListWidget(this);
     p->listWidget->setViewMode(QListView::IconMode);
-    p->listWidget->setIconSize(QSize(64, 64));
+    p->listWidget->setIconSize(QSize(32, 32));
     p->listWidget->setMovement(QListView::Static);
-    p->listWidget->setFixedWidth(110);
+    p->listWidget->setFixedWidth(100);
+    p->listWidget->setGridSize(QSize(95, 55));
     p->listWidget->setSpacing(12);
 
 
@@ -105,6 +183,8 @@ void ConfigDialog::setupUi() {
 	*/
 	p->stackedWidget->addWidget(createKeyboardWidget());
 	p->stackedWidget->addWidget(createMouseWidget());
+	p->stackedWidget->addWidget(createComatibilityWidget());
+	p->stackedWidget->addWidget(createUpdateWidget());
 	p->stackedWidget->addWidget(createI18nWidget());
 
 	createItems(p->listWidget);
@@ -146,6 +226,16 @@ void ConfigDialog::createItems(QListWidget *listWidget) {
     p->mouseItem->setTextAlignment(Qt::AlignHCenter);
     p->mouseItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
+    p->compatibilityItem = new QListWidgetItem(listWidget);
+	p->compatibilityItem->setIcon(QIcon(":tools-report-bug.big"));
+    p->compatibilityItem->setTextAlignment(Qt::AlignHCenter);
+    p->compatibilityItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+    p->updateItem = new QListWidgetItem(listWidget);
+	p->updateItem->setIcon(QIcon(":system-software-update.big"));
+    p->updateItem->setTextAlignment(Qt::AlignHCenter);
+    p->updateItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
     p->i18nItem = new QListWidgetItem(listWidget);
 	p->i18nItem->setIcon(QIcon(":applications-education-language.big"));
     p->i18nItem->setTextAlignment(Qt::AlignHCenter);
@@ -156,6 +246,79 @@ void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previou
     if (!current)
         current = previous;
     p->stackedWidget->setCurrentIndex(p->listWidget->row(current));
+}
+
+
+void ConfigDialog::ignoreWindow(const QString &caption, const QString &className)
+{
+	QList<QVariant> ignoredWindows = p->ignoredWindowsModel.ignoredWindows();
+	WindowInfo info;
+	info.caption = caption;
+	info.className = className;
+
+	QVariant windowVariant;
+	windowVariant.setValue(info);
+	ignoredWindows.append(windowVariant);
+
+	p->ignoredWindowsModel.setIgnoredWindows(ignoredWindows);
+	p->config->setLater(Config::c_ignoredWindows, ignoredWindows);
+
+	/*if(!isVisible())
+	{*/
+		p->config->commit();
+	//}
+	qDebug(qPrintable(caption));
+	qDebug(qPrintable(className));
+}
+
+void ConfigDialog::removeSelectedIgnoredWindow()
+{
+
+	QModelIndex index = p->ignoredWindowsView->selectionModel()->currentIndex();
+	if(index.isValid())
+	{
+		QList<QVariant> ignoredWindows = p->ignoredWindowsModel.ignoredWindows();
+		ignoredWindows.removeAt(index.row());
+		p->ignoredWindowsModel.setIgnoredWindows(ignoredWindows);
+		p->config->setLater(Config::c_ignoredWindows, ignoredWindows);
+	}
+}
+
+QWidget *ConfigDialog::createComatibilityWidget()
+{
+	QWidget *w = new QWidget;
+
+	QVBoxLayout *layout = new QVBoxLayout(w);
+
+	p->ignoredWindowsBox = new QGroupBox();
+
+	QVBoxLayout *boxLayout = new QVBoxLayout(p->ignoredWindowsBox);
+	QTableView *view = new QTableView;
+	view->setSelectionBehavior(QAbstractItemView::SelectRows);
+	view->setSelectionMode(QAbstractItemView::SingleSelection);
+	view->setModel(&p->ignoredWindowsModel);
+	p->ignoredWindowsView = view;
+	QHBoxLayout *buttons = new QHBoxLayout;
+	buttons->addStretch();
+	p->removeIgnoredButton = new QPushButton();
+
+	connect(p->removeIgnoredButton, SIGNAL(clicked()),
+		this, SLOT(removeSelectedIgnoredWindow()));
+
+	buttons->addWidget(p->removeIgnoredButton);
+	boxLayout->addWidget(view);
+	boxLayout->addLayout(buttons);
+
+	layout->addWidget(p->ignoredWindowsBox);
+
+	layout->addStretch();
+	return w;
+}
+
+QWidget *ConfigDialog::createUpdateWidget()
+{
+	QWidget *w = new QWidget;
+	return w;
 }
 
 QWidget * ConfigDialog::createMouseWidget() {
@@ -351,6 +514,7 @@ void ConfigDialog::showEvent(QShowEvent *e) {
 	p->languageCombo->setCurrentIndex(index);
 	
 	p->defaultHitCornerBox->setCurrentIndex(p->config->defaultHitCorner());
+	p->ignoredWindowsModel.setIgnoredWindows(p->config->ignoredWindows());
 
 	QDialog::showEvent(e);
 }
@@ -371,6 +535,8 @@ void ConfigDialog::translateUi() {
     p->keyboardItem->setText(tr("Keyboard"));
     p->mouseItem->setText(tr("Mouse"));
     p->i18nItem->setText(tr("Language"));
+    p->compatibilityItem->setText(tr("Compatibility"));
+    p->updateItem->setText(tr("Update"));
 	p->languageLabel->setText(tr("Language"));
 
 	p->r1->setText(tr("Pick windows using double click"));
@@ -381,6 +547,9 @@ void ConfigDialog::translateUi() {
 	p->showHotkeyLabelsBox->setText(tr("Enable window hotkeys"));
 
 	p->defaultHitCornerLabel->setText(tr("Show windowpicker hot corner"));
+
+	p->ignoredWindowsBox->setTitle(tr("Ignored windows"));
+	p->removeIgnoredButton->setText(tr("Remove"));
 }
 
 }

@@ -33,6 +33,15 @@ typedef QList<int> WindowHandleList;
 typedef QSet<int> WindowHandleSet;
 typedef QList<int> Hotkey;
 
+struct WindowInfo {
+	int handle;
+	QString caption;
+	QString className;
+};
+
+
+typedef QList<WindowInfo> WindowInfoList;
+
 class WindowControllerImpl;
 struct WindowControllerPrivate;
 class WindowPriview;
@@ -42,12 +51,12 @@ class WindowController : public QObject {
 public:
 	static WindowController *instance();
 
-
 	WindowHandleList windowHandleList() const;
 	void updateWindowInfoList();
 	void startUpdateWindowPreviews();
 
 	QString	windowCaption(int) const;
+	QString	windowClassName(int) const;
 	QString	windowDescription(int) const;
 
 	QPixmap windowPreview(int) const;
@@ -68,6 +77,8 @@ public:
 	void maximizeWindow(int);
 	void closeWindow(int);
 
+	void ignoreWindow(int);
+
 	QPixmap windowHotkeyPixmap(int) const;
 	Hotkey windowHotkey(int) const;
 	int findWindowByHotkey(const Hotkey&) const;
@@ -85,6 +96,7 @@ signals:
 	void windowDisappeared(int handle);
 
 	void windowHandleListChanged(const WindowHandleList &);
+	void windowIgnoreRequested(const QString &, const QString &);
 private:
 	void setWindowPreview(int handle, const QPixmap &);
 	WindowControllerImpl *impl;
@@ -113,5 +125,9 @@ private:
 	friend class WindowSelect;
 };
 
+
 }
+
+
+
 #endif

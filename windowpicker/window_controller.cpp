@@ -30,11 +30,29 @@
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QThreadPool>
+#include <QDataStream>
 
 #include "windowpicker/window_controller_impl.h"
 #include "windowpicker/config.h"
 #include "windowpicker/unique_runnable.h"
 #include "windowpicker/unique_runnable_inl.h"
+
+QDataStream & operator<<(QDataStream & out, const WindowPicker::WindowInfo & info)
+{
+	out << info.handle ;
+	out << info.caption;
+	out << info.className;
+	return out;
+};
+
+QDataStream & operator>>(QDataStream & in, WindowPicker::WindowInfo & info)
+{
+	in >> info.handle;
+	in >> info.caption;
+	in >> info.className;
+	return in;
+};
+
 
 namespace WindowPicker {
 
@@ -130,6 +148,9 @@ WindowController::WindowController() : impl(new WindowControllerImpl), p(new Win
 
 	updateWindowInfoList();
 	startUpdateWindowPreviews();
+
+	qRegisterMetaType<WindowPicker::WindowInfo>("WindowPicker::WindowInfo");
+	qRegisterMetaTypeStreamOperators<WindowPicker::WindowInfo>("WindowPicker::WindowInfo");
 }
 
 WindowController::~WindowController() {
@@ -217,6 +238,10 @@ QString WindowController::windowCaption(int handle) const {
 		return p->captionCache[handle];
 	}
 	return QString::null;
+}
+
+QString WindowController::windowClassName(int handle) const {
+	return impl->windowClassName(handle);
 }
 
 QString WindowController::windowDescription(int handle) const {
@@ -397,6 +422,14 @@ void WindowController::tileWindows(const WindowHandleList &list, ETile tile) {
 
 void WindowController::minimizeWindow(int handle) {
 	impl->minimizeWindow(handle);
+}
+
+void WindowController::ignoreWindow(int handle)
+{
+	emit windowIgnoreRequested(
+		 impl->windowCaption(handle),
+		 impl->windowClassName(handle)
+	);
 }
 
 void WindowController::maximizeWindow(int handle) {

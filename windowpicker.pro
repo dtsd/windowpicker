@@ -1,14 +1,9 @@
 TEMPLATE = app
-#CONFIG += console
-TARGET = windowpicker
-#DEPENDPATH += .
 INCLUDEPATH += .
 
-VERSION_MAJOR = 1
-VERSION_MINOR = 1
-VERSION = "$${VERSION_MAJOR}.$${VERSION_MINOR}"
+CONFIG += console
 
-DEFINES += VERSION_MAJOR VERSION_MINOR
+include(version.pri)
 
 DESTDIR += install
 
@@ -100,8 +95,8 @@ win32 {
 }
 
 
-#tarball.commands = git archive --format zip --output="$${TARGET}-$${VERSION}.zip" master 
-tarball.commands = git archive master | bzip2 > "$${TARGET}-$${VERSION}.tar.bz2" 
+#tarball.commands = git archive --format zip --output="$${TARGET}-$${APPLICATION_VERSION}.zip" master 
+tarball.commands = git archive master | bzip2 > "$${TARGET}-$${APPLICATION_VERSION}.tar.bz2" 
 
 QMAKE_EXTRA_TARGETS += tarball
 

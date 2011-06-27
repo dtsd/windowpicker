@@ -32,19 +32,20 @@
 
 int main(int argc, char * argv[])
 {
+
 	QtSingleApplication app(argc, argv);
 	if(app.isRunning()) {
 		app.sendMessage(QString::null);
 		return 0;
 	}
 
-	QCoreApplication::setOrganizationName("Dmitry Teslenko");
-	QCoreApplication::setOrganizationDomain("dteslenko@gmail.com");
-	QCoreApplication::setApplicationName("windowpicker");
-	QCoreApplication::setApplicationVersion(QString("%1.%2")
-		.arg(VERSION_MAJOR)
-		.arg(VERSION_MINOR)
-	);
+	QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
+	QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
+	QCoreApplication::setApplicationName(APPLICATION_NAME);
+	QCoreApplication::setApplicationVersion(QString("%1.%2.%3")
+		.arg(APPLICATION_VERSION_MAJOR)
+		.arg(APPLICATION_VERSION_MINOR)
+		.arg(APPLICATION_VERSION_PATCH));
 
     QApplication::setQuitOnLastWindowClosed(false);
 
@@ -61,6 +62,13 @@ int main(int argc, char * argv[])
 		SIGNAL(languageChanged()),
 		&icon,
 		SLOT(translateUi())
+	);
+
+	QObject::connect(
+		WindowPicker::WindowController::instance(),
+		SIGNAL(windowIgnoreRequested(const QString &, const QString &)),
+		&configDialog,
+		SLOT(ignoreWindow(const QString &, const QString &))
 	);
 
 	QObject::connect(

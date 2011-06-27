@@ -30,12 +30,6 @@
 
 namespace WindowPicker {
 
-struct WindowInfo {
-	HWND handle;
-	QString className;
-};
-
-typedef QList<WindowInfo> WindowInfoList;
 const int MAX_TASK_CAPTION_SIZE = 200;
 const int MAX_TASK_CLASS_NAME_SIZE = 200;
 
@@ -68,7 +62,7 @@ BOOL CALLBACK WindowControllerImpl_updateWindowInfoListCallback(HWND hwnd, LPARA
 					&& className.compare("shell_traywnd", Qt::CaseInsensitive)) {
 
 					WindowInfo ti;
-					ti.handle = hwnd;
+					ti.handle = (int)hwnd;
 					ti.className = className;
 					WindowControllerImpl_taskInfoList.push_back(ti);
 
@@ -111,6 +105,12 @@ QString WindowControllerImpl::windowCaption(int handle) const {
 
 QString WindowControllerImpl::windowDescription(int handle) const {
 	return WindowControllerImpl_getWindowCaption((HWND)handle)
+		//+ QString(": ") + WindowControllerImpl_getWindowClassName((HWND)handle)
+		;
+}
+
+QString WindowControllerImpl::windowClassName(int handle) const {
+	return WindowControllerImpl_getWindowClassName((HWND)handle)
 		//+ QString(": ") + WindowControllerImpl_getWindowClassName((HWND)handle)
 		;
 }

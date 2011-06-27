@@ -29,6 +29,7 @@ Key Config::c_replaceDefaultSwitcher = "replaceDefaultSwitcher";
 Key Config::c_i18nFile = "i18nFile";
 Key Config::c_showHotkeyLabels = "showHotkeyLabels";
 Key Config::c_defaultHitCorner = "defaultHitCorner";
+Key Config::c_ignoredWindows = "ignoredWindows";
 
 struct ConfigPrivate {
 	ConfigPrivate() :isSetLater(false) {};
@@ -46,6 +47,7 @@ Config::~Config() {
 	delete p;
 }
 
+
 void Config::setupDefaults() {
 	p->defaults[c_selectWithSingleClick] = true;
 	p->defaults[c_defaultKeySequence] = QKeySequence(Qt::Key_E + Qt::CTRL + Qt::ALT);
@@ -53,6 +55,8 @@ void Config::setupDefaults() {
 	p->defaults[c_i18nFile] = QLocale::system().name();
 	p->defaults[c_showHotkeyLabels] = true;
 	p->defaults[c_defaultHitCorner] = 0;
+
+	p->defaults[c_ignoredWindows] = QList<QVariant>();
 }
 
 QVariant Config::defaultValue(const QString &key) const {
@@ -159,6 +163,17 @@ void Config::setDefaultHitCorner(int value) {
 	emitChanged();
 }
 
+QList<QVariant> Config::ignoredWindows() const {
+	return p->settings.value(
+		c_ignoredWindows, defaultValue(c_ignoredWindows)
+	).toList();
+}
+
+
+void Config::setIgnoredWindows(const QList<QVariant> &value) {
+	p->settings.setValue(c_ignoredWindows, value);
+	emitChanged();
+}
 
 }
 

@@ -8,11 +8,13 @@
 
     <file alias="default-preview">images/128x128/actions/edit-bomb.png</file>
     <file alias="preferences-system-windows">images/16x16/apps/preferences-system-windows.png</file>
-    <file alias="preferences-system-windows.big">images/64x64/apps/preferences-system-windows.png</file>
-    <file alias="preferences-desktop-accessibility.big">images/64x64/apps/preferences-desktop-accessibility.png</file>
-    <file alias="preferences-desktop-keyboard.big">images/64x64/apps/preferences-desktop-keyboard.png</file>
-    <file alias="preferences-desktop-mouse.big">images/64x64/apps/preferences-desktop-mouse.png</file>
-    <file alias="applications-education-language.big">images/64x64/categories/applications-education-language.png</file>
+    <file alias="preferences-system-windows.big">images/32x32/apps/preferences-system-windows.png</file>
+    <file alias="preferences-desktop-accessibility.big">images/32x32/apps/preferences-desktop-accessibility.png</file>
+    <file alias="preferences-desktop-keyboard.big">images/32x32/apps/preferences-desktop-keyboard.png</file>
+    <file alias="preferences-desktop-mouse.big">images/32x32/apps/preferences-desktop-mouse.png</file>
+    <file alias="system-software-update.big">images/32x32/apps/system-software-update.png</file>
+    <file alias="tools-report-bug.big">images/32x32/actions/tools-report-bug.png</file>
+    <file alias="applications-education-language.big">images/32x32/categories/applications-education-language.png</file>
 </qresource>
 </RCC>
 

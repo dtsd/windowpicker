@@ -25,6 +25,7 @@
 
 namespace WindowPicker {
 
+
 class WindowControllerImpl {
 public:
 	void updateWindowInfoList();
@@ -32,6 +33,7 @@ public:
 	WindowHandleList windowHandleList() const;
 	QString	windowCaption(int) const;
 	QString	windowDescription(int) const;
+	QString	windowClassName(int) const;
 
 	QPixmap windowPixmap(int) const;
 	QPixmap windowIcon(int) const;

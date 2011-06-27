@@ -54,6 +54,10 @@ class Config: public QObject {
 	Q_PROPERTY (int defaultHitCorner
 		READ defaultHitCorner WRITE setDefaultHitCorner
 	)
+
+	Q_PROPERTY (QList<QVariant> ignoredWindows
+		READ ignoredWindows WRITE setIgnoredWindows
+	)
 public:
 	Config();
 	virtual ~Config();
@@ -85,6 +89,10 @@ public:
 	int defaultHitCorner() const;	
 	void setDefaultHitCorner(int);
 	static Key c_defaultHitCorner;
+
+	QList<QVariant> ignoredWindows() const;
+	void setIgnoredWindows(const QList<QVariant> &);
+	static Key c_ignoredWindows;
 signals:
 	void changed(const Config &);
 private:

@@ -46,6 +46,7 @@ struct WindowListDialog::Private {
 		selectAction(0),
 		cascadeAction(0), tileVerticallyAction(0), tileHorizontallyAction(0),
 		minimizeAction(0), maximizeAction(0), closeAction(0),
+		ignoreAction(0),
 		isNextPrev(false), isHotkeyLabelsShown(false),
 		label(0), pixmapLabel(0), defaultHitCorner(0) {};
 
@@ -53,7 +54,7 @@ struct WindowListDialog::Private {
 	QMenu *menu;
 	QAction *selectAction;
 	QAction *cascadeAction, *tileVerticallyAction, *tileHorizontallyAction;
-	QAction *minimizeAction, *maximizeAction, *closeAction;
+	QAction *minimizeAction, *maximizeAction, *closeAction, *ignoreAction;
 	QKeySequence defaultKeySequence;
 	bool isNextPrev;
 	bool isHotkeyLabelsShown;
@@ -126,6 +127,9 @@ void WindowListDialog::setupActions() {
 
 	p->minimizeAction = new QAction( this);
 	connect(p->minimizeAction, SIGNAL(triggered()), this, SLOT(minimizeSelected()));
+
+	p->ignoreAction = new QAction(this);
+	connect(p->ignoreAction, SIGNAL(triggered()), this, SLOT(ignoreSelected()));
 
 
 	p->maximizeAction = new QAction( this);
@@ -224,12 +228,13 @@ void WindowListDialog::setupContextMenu() {
 
 	p->menu->addAction(p->selectAction);
 	p->menu->addSeparator();
+	p->menu->addAction(p->minimizeAction);
+	p->menu->addAction(p->maximizeAction);
 	p->menu->addAction(p->cascadeAction);
 	p->menu->addAction(p->tileHorizontallyAction);
 	p->menu->addAction(p->tileVerticallyAction);
 	p->menu->addSeparator();
-	p->menu->addAction(p->minimizeAction);
-	p->menu->addAction(p->maximizeAction);
+	p->menu->addAction(p->ignoreAction);
 	p->menu->addSeparator();
 	p->menu->addAction(p->closeAction);
 }
@@ -399,6 +404,19 @@ void WindowListDialog::closeWindow(const QModelIndex &index) {
 	WindowController::instance()->updateWindowInfoList();
 }
 
+void WindowListDialog::ignoreWindow(const QModelIndex &index)
+{
+	if(!index.isValid()) {
+		return;
+	}
+	
+	int handle = p->view->model()->data(index, WindowListModel::ERole_Handle).toInt();
+	WindowController::instance()->ignoreWindow(handle);
+
+	QCoreApplication::instance()->processEvents();
+	WindowController::instance()->updateWindowInfoList();
+}
+
 void WindowListDialog::minimizeWindow(const QModelIndex &index) {
 	if(!index.isValid()) {
 		return;
@@ -509,6 +527,21 @@ void WindowListDialog::tileVerticallySelected() {
 
 }
 
+void WindowListDialog::ignoreSelected()
+{
+	QModelIndexList indexList = p->view->selectionModel()->selectedIndexes();
+	
+	if(indexList.isEmpty()) {
+		return;
+	}
+	
+	for(QModelIndexList::const_iterator it = indexList.begin(); it != indexList.end(); ++it) 
+	{
+		ignoreWindow(*it);
+	}
+}
+
+
 void WindowListDialog::minimizeSelected() {
 	QModelIndexList indexList = p->view->selectionModel()->selectedIndexes();
 	
@@ -606,6 +639,7 @@ void WindowListDialog::translateUi() {
 	p->minimizeAction->setText(tr("Minimize"));
 	p->maximizeAction->setText(tr("Maximize"));
 	p->closeAction->setText(tr("Close"));
+	p->ignoreAction->setText(tr("Ignore"));
 }
 
 bool WindowListDialog::eventFilter(QObject *obj, QEvent *event) {

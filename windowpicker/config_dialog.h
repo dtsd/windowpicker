@@ -40,6 +40,8 @@ public:
 public slots:
 	virtual void accept();
 	virtual void reject();
+
+	void ignoreWindow(const QString &, const QString &);
 protected slots:
 	void changePage(QListWidgetItem*, QListWidgetItem*);
 	void setSelectWithSingleClick(int);
@@ -48,6 +50,7 @@ protected slots:
 	void setI18nFileByIndex(int);
 	void setShowHotkeyLabels(bool);
 	void setDefaultHitCorner(int);
+	void removeSelectedIgnoredWindow();
 protected:
 	void showEvent(QShowEvent *);
 	void changeEvent(QEvent *);
@@ -60,6 +63,8 @@ private:
 	QWidget *createMouseWidget();
 	QWidget *createKeyboardWidget();
 	QWidget *createI18nWidget();
+	QWidget *createComatibilityWidget();
+	QWidget *createUpdateWidget();
 	void createItems(QListWidget *);
 
 	ConfigDialogPrivate *p;
