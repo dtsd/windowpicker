@@ -29,7 +29,7 @@ WindowInfoList WindowControllerImpl_taskInfoList;
 
 int WindowInfoList_findByWindow(const WindowInfoList &list, int window) {
 	for(int i = 0; i < list.size(); ++i) {
-		if(list[i].window == window) {
+		if(list[i].handle == window) {
 			return i;
 		}
 	}
@@ -70,20 +70,19 @@ void WindowControllerImpl::updateWindowInfoList() {
 		}
 
 		WindowInfo ti;
-		ti.window = w;
+		ti.handle = w;
 		ti.caption = caption;
 		WindowControllerImpl_taskInfoList.push_back(ti);
 	}
 
 	XFree(pChildren);
-
 	XCloseDisplay(dpy);
 }
 
 WindowHandleList WindowControllerImpl::windowHandleList() const {
 	WindowHandleList list;
 	for(int i = 0; i < WindowControllerImpl_taskInfoList.size(); ++i) {
-		list.push_back(WindowControllerImpl_taskInfoList[i].window);
+		list.push_back(WindowControllerImpl_taskInfoList[i].handle);
 	}
 	return list;
 }
@@ -94,6 +93,11 @@ QString WindowControllerImpl::windowCaption(int handle) const {
 		return WindowControllerImpl_taskInfoList.at(i).caption;
 	}
 	return QString::null;
+}
+
+QString	WindowControllerImpl::windowClassName(int) const
+{
+	return QString();
 }
 
 QString WindowControllerImpl::windowDescription(int handle) const {

@@ -55,7 +55,7 @@ protected:
 	void showEvent(QShowEvent *);
 	void changeEvent(QEvent *);
 private:
-	ConfigDialog(const ConfigDialog&) {};
+	ConfigDialog(const ConfigDialog&) : QDialog() {};
 	ConfigDialog & operator=(const ConfigDialog &) { return *this; };
 
 	void setupUi();

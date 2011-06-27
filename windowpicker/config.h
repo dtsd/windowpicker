@@ -96,7 +96,7 @@ public:
 signals:
 	void changed(const Config &);
 private:
-	Config(const Config &) {};
+	Config(const Config &) : QObject() {};
 	Config & operator=(const Config&) { return *this; };
 
 	void setupDefaults();

@@ -44,7 +44,7 @@ protected:
 	virtual void focusInEvent(QFocusEvent *e);
 	virtual void focusOutEvent(QFocusEvent *e);
 private:
-	KeySequenceEdit(const KeySequenceEdit &) {};
+	KeySequenceEdit(const KeySequenceEdit &) : QLineEdit() {};
 	KeySequenceEdit& operator=(const KeySequenceEdit &) { return *this; };
 
 	void setupUi();
